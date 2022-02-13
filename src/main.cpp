@@ -3,24 +3,22 @@
 #include <Adafruit_SSD1306.h>
 #include <Adafruit_GFX.h>
 #include <Arduino.h>
-#include <Fonts/FreeSans12pt7b.h>
 
 #define SDA 16
 #define SCL 17
-#define AHT_ADDRESS 0x38
-#define SSD1306_ADDRESS 0x3C
+#define SSD1306_WIDTH 128
+#define SSD1306_HEIGHT 64
 
-TwoWire ahtI2C(SDA, SCL);
+
+TwoWire i2c(SDA, SCL);
 Adafruit_AHTX0 aht;
-
-TwoWire displayI2C(SDA, SCL);
-Adafruit_SSD1306 ssd1306((uint8_t)128, (uint8_t)64, &displayI2C);
+Adafruit_SSD1306 ssd1306(SSD1306_WIDTH, SSD1306_HEIGHT, &i2c);
 
 void setup() {
   Serial.begin(9600);
 
-  ahtI2C.begin(AHT_ADDRESS);
-  bool ok = aht.begin(&ahtI2C);
+  // initialize the AHT10 sensor at address 0x38.
+  bool ok = aht.begin(&i2c);
   if (!ok) {
     while (true) {
       Serial.println("No AHT");
@@ -29,17 +27,14 @@ void setup() {
   }
   Serial.println("AHT initialized");
 
-  ok = ssd1306.begin(SSD1306_SWITCHCAPVCC, SSD1306_ADDRESS, false, true);
+  // Initialize the SSD1306 display at address 0x3C
+  ok = ssd1306.begin(SSD1306_SWITCHCAPVCC, 0x3C, false, true);
   if (!ok) {
     while (true) {
       Serial.println("No SSD1309");
       delay(500);
     }
   }
-  ssd1306.clearDisplay();
-  ssd1306.setTextColor(SSD1306_WHITE);
-  // ssd1306.setFont(&FreeSans12pt7b);
-  ssd1306.setTextSize(1);
 }
 
 void loop() {
@@ -57,17 +52,16 @@ void loop() {
   Serial.println();
 
   ssd1306.clearDisplay();
-
+  ssd1306.setTextColor(SSD1306_WHITE);
   ssd1306.setCursor(0, 20);
+
   ssd1306.print("Temperature: ");
   ssd1306.print(temp.temperature);
-  ssd1306.println("C");
-
+  ssd1306.println(" C");
   ssd1306.println();
-
-  ssd1306.print("Humidity:    ");
+  ssd1306.print("   Humidity: ");
   ssd1306.print(humidity.relative_humidity);
-  ssd1306.println("%");
+  ssd1306.println(" %");
 
   ssd1306.display();
 
