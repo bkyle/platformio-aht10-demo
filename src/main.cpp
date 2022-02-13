@@ -9,7 +9,6 @@
 #define SSD1306_WIDTH 128
 #define SSD1306_HEIGHT 64
 
-
 TwoWire i2c(SDA, SCL);
 Adafruit_AHTX0 aht;
 Adafruit_SSD1306 ssd1306(SSD1306_WIDTH, SSD1306_HEIGHT, &i2c);
@@ -17,7 +16,7 @@ Adafruit_SSD1306 ssd1306(SSD1306_WIDTH, SSD1306_HEIGHT, &i2c);
 void setup() {
   Serial.begin(9600);
 
-  // initialize the AHT10 sensor at address 0x38.
+  // Initialize the AHT10 sensor at its default address, 0x38.
   bool ok = aht.begin(&i2c);
   if (!ok) {
     while (true) {
